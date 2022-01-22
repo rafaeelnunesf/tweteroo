@@ -21,7 +21,19 @@ const tweets = [
     tweet: "eu amo o hub",
   },
 ];
-
+function validURL(str) {
+  const pattern = new RegExp(
+    "^(https?:\\/\\/)?" + // protocol
+      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+      "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+      "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+      "(\\#[-a-z\\d_]*)?$",
+    "i"
+  ); // fragment locator
+  console.log(typeof pattern);
+  return !!pattern.test(str);
+}
 app.post("/sign-up", (req, res) => {
   users.push(req.body);
   if (
@@ -33,8 +45,15 @@ app.post("/sign-up", (req, res) => {
     res.sendStatus(400);
     return;
   }
-  res.send("OK");
+  if (validURL(req.body.avatar)) {
+    res.status(201);
+    res.send("OK");
+  } else {
+    res.status(400);
+    res.send("Insira uma url válida");
+  }
 });
+
 app.post("/tweets", (req, res) => {
   const tweet = req.body;
   if (
@@ -43,6 +62,7 @@ app.post("/tweets", (req, res) => {
     tweet.tweet === undefined ||
     tweet.tweet === ""
   ) {
+    res.status(400);
     res.send("Todos os campos são obrigatórios!");
     return;
   }
@@ -53,6 +73,7 @@ app.post("/tweets", (req, res) => {
       (user) => user.username === req.body.username
     ).avatar;
     tweets.push(tweet);
+    res.status(201);
     res.send("OK");
   }
 });
