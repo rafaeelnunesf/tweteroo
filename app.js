@@ -1,5 +1,6 @@
 import express, { json } from "express";
 import cors from "cors";
+import validURL from "./validURL.js";
 
 const app = express();
 app.use(json());
@@ -21,18 +22,7 @@ const tweets = [
     tweet: "eu amo o hub",
   },
 ];
-function validURL(str) {
-  const pattern = new RegExp(
-    "^(https?:\\/\\/)?" + // protocol
-      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-      "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-      "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-      "(\\#[-a-z\\d_]*)?$",
-    "i"
-  ); // fragment locator
-  return !!pattern.test(str);
-}
+
 app.post("/sign-up", (req, res) => {
   users.push(req.body);
   if (
@@ -71,9 +61,12 @@ app.post("/tweets", (req, res) => {
     res.send("Usuário não cadastrado");
   } else {
     tweet.avatar = users.find((user) => user.username === username).avatar;
+    tweet.username = username;
+
     tweets.push(tweet);
+
     res.status(201);
-    res.send("OK");
+    res.send(tweet);
   }
 });
 
@@ -81,6 +74,18 @@ app.get("/tweets", (req, res) => {
   let lastTweets;
   tweets.length > 10 ? (lastTweets = tweets.slice(-10)) : (lastTweets = tweets);
   res.send(lastTweets);
+});
+
+app.get("/tweets/:USERNAME", (req, res) => {
+  const name = req.params.USERNAME;
+  const userTweets = tweets.filter((tweet) => tweet.username === name);
+
+  if (userTweets.length === 0) {
+    res.status(400);
+    res.send("Usuário não cadastrado");
+  } else {
+    res.send(userTweets);
+  }
 });
 
 app.listen(5000, () => {
