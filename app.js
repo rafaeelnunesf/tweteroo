@@ -31,7 +31,6 @@ function validURL(str) {
       "(\\#[-a-z\\d_]*)?$",
     "i"
   ); // fragment locator
-  console.log(typeof pattern);
   return !!pattern.test(str);
 }
 app.post("/sign-up", (req, res) => {
@@ -56,9 +55,10 @@ app.post("/sign-up", (req, res) => {
 
 app.post("/tweets", (req, res) => {
   const tweet = req.body;
+  const username = req.headers.user;
   if (
-    tweet.username === undefined ||
-    tweet.username === "" ||
+    username === undefined ||
+    username === "" ||
     tweet.tweet === undefined ||
     tweet.tweet === ""
   ) {
@@ -66,12 +66,11 @@ app.post("/tweets", (req, res) => {
     res.send("Todos os campos são obrigatórios!");
     return;
   }
-  if (users.find((user) => user.username === req.body.username) === undefined) {
-    res.sendStatus(400);
+  if (users.find((user) => user.username === username) === undefined) {
+    res.status(400);
+    res.send("Usuário não cadastrado");
   } else {
-    tweet.avatar = users.find(
-      (user) => user.username === req.body.username
-    ).avatar;
+    tweet.avatar = users.find((user) => user.username === username).avatar;
     tweets.push(tweet);
     res.status(201);
     res.send("OK");
