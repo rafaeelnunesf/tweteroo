@@ -24,15 +24,37 @@ const tweets = [
 
 app.post("/sign-up", (req, res) => {
   users.push(req.body);
+  if (
+    req.body.username === undefined ||
+    req.body.username === "" ||
+    req.body.avatar === undefined ||
+    req.body.avatar === ""
+  ) {
+    res.sendStatus(400);
+    return;
+  }
   res.send("OK");
 });
 app.post("/tweets", (req, res) => {
   const tweet = req.body;
-  tweet.avatar = users.find(
-    (user) => user.username === req.body.username
-  ).avatar;
-  tweets.push(tweet);
-  res.send(tweet);
+  if (
+    tweet.username === undefined ||
+    tweet.username === "" ||
+    tweet.tweet === undefined ||
+    tweet.tweet === ""
+  ) {
+    res.send("Todos os campos são obrigatórios!");
+    return;
+  }
+  if (users.find((user) => user.username === req.body.username) === undefined) {
+    res.sendStatus(400);
+  } else {
+    tweet.avatar = users.find(
+      (user) => user.username === req.body.username
+    ).avatar;
+    tweets.push(tweet);
+    res.send("OK");
+  }
 });
 
 app.get("/tweets", (req, res) => {
