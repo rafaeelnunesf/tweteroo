@@ -5,7 +5,8 @@
   "description": "Tweteroo is a twitter clone project where I built my first back-end!",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx nodemon app.js"
   },
   "repository": {
     "type": "git",
