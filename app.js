@@ -71,9 +71,16 @@ app.post("/tweets", (req, res) => {
 });
 
 app.get("/tweets", (req, res) => {
-  let lastTweets;
-  tweets.length > 10 ? (lastTweets = tweets.slice(-10)) : (lastTweets = tweets);
-  res.send(lastTweets);
+  const page = req.query.page;
+  if (page < 1) {
+    res.status(400);
+    res.send("Informe uma página válida!");
+    return;
+  }
+
+  tweets.length > 10
+    ? res.send(tweets.slice((page - 1) * 10, page * 10))
+    : res.send(tweets);
 });
 
 app.get("/tweets/:USERNAME", (req, res) => {
